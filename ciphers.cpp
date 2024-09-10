@@ -58,6 +58,7 @@ int main() {
     } else if (command == "C" || command == "c") {
       runCaesarEncrypt();
     }
+    // Test
 
     cout << endl;
 
