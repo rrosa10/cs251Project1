@@ -71,17 +71,41 @@ int main() {
 #pragma region CaesarEnc
 
 char rot(char c, int amount) {
-  // TODO: student fill this in
-  return 'A';
+  char cUpper = toupper(c);
+  int newCharASCIIVall = cUpper + amount;
+  char newChar;
+  if (newCharASCIIVall > 'Z') {
+    newChar = 'A' + (newCharASCIIVall - 'Z' - 1);
+  } else {
+    newChar = 'A' + newCharASCIIVall;
+  }
+  return newChar;
 }
 
 string rot(const string& line, int amount) {
-  // TODO: student fill this in
-  return "";
+  string encyrptedString;
+  for (int i = 0; i < line.size(); i++) {
+    if (line[i] >= 'a' && line[i] <= 'z') {
+      encyrptedString[i] = rot((toupper(line[i])), amount);
+    } else if (line[i] >= 'A' && line[i] <= 'Z') {
+      encyrptedString[i] = rot(line[i], amount);
+    }
+  }
+  return encyrptedString;
+  //
 }
 
 void runCaesarEncrypt() {
-  // TODO: student fill this in
+  string messages;
+  string encryptedMessage;
+  int rotateAmmount;
+  cout << "Enter the text to Caesar encrypt: " << endl;
+  cin >> messages;
+  cout << "\nEnter the number of characters to rotate by: ";
+
+  cin >> rotateAmmount;
+  encryptedMessage = rot(messages, rotateAmmount);
+  cout << encryptedMessage << endl;
 }
 
 #pragma endregion CaesarEnc
