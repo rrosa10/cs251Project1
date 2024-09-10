@@ -1,0 +1,29 @@
+{
+  "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google }",
+  "C_Cpp.default.includePath": ["${workspaceFolder}/**"],
+  "files.associations": {
+    "**/templates/**/*": "django-txt",
+    "**/templates/**/*.html": "django-html",
+    "*.html": "html",
+    "*.json": "jsonc",
+    "*.txt": "txt",
+    "*.tmpl": "django-html",
+    "iosfwd": "cpp",
+    "*.tcc": "cpp",
+    "sstream": "cpp",
+    "ostream": "cpp",
+    "iostream": "cpp",
+    "tuple": "cpp",
+    "string": "cpp",
+    "fstream": "cpp",
+    "chrono": "cpp"
+  },
+  "[cpp]": {
+    "editor.wordBasedSuggestions": "off",
+    "editor.suggest.insertMode": "replace",
+    "editor.semanticHighlighting.enabled": true,
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+  },
+  "C_Cpp.default.compilerPath": "/usr/bin/clang++"
+}
