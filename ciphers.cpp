@@ -55,6 +55,8 @@ int main() {
               "generator: ";
       getline(cin, seed_str);
       Random::seed(stoi(seed_str));
+    } else if (command == "C" || command == "c") {
+      runCaesarEncrypt();
     }
 
     cout << endl;
@@ -72,38 +74,39 @@ int main() {
 
 char rot(char c, int amount) {
   char cUpper = toupper(c);
-  int newCharASCIIVall = cUpper + amount;
-  char newChar;
-  if (newCharASCIIVall > 'Z') {
-    newChar = 'A' + (newCharASCIIVall - 'Z' - 1);
-  } else {
-    newChar = 'A' + newCharASCIIVall;
+  if (cUpper >= 'A' && cUpper <= 'Z') {
+    int newCharASCIIVall = cUpper + amount;
+    if (newCharASCIIVall > 'Z') {
+      newCharASCIIVall = 'A' + (newCharASCIIVall - 'Z' - 1);
+    }
+    return (char)newCharASCIIVall;
   }
-  return newChar;
+  return c;
 }
 
 string rot(const string& line, int amount) {
-  string encyrptedString;
-  for (int i = 0; i < line.size(); i++) {
-    if (line[i] >= 'a' && line[i] <= 'z') {
-      encyrptedString[i] = rot((toupper(line[i])), amount);
-    } else if (line[i] >= 'A' && line[i] <= 'Z') {
-      encyrptedString[i] = rot(line[i], amount);
+  string newString;
+  for (char ch : line) {
+    if (ch == ' ') {
+      newString += ' ';
+    } else {
+      newString += rot(ch, amount);
     }
   }
-  return encyrptedString;
-  //test 3 i guess
+  return newString;
 }
 
 void runCaesarEncrypt() {
   string messages;
   string encryptedMessage;
   int rotateAmmount;
-  cout << "Enter the text to Caesar encrypt: " << endl;
-  cin >> messages;
-  cout << "\nEnter the number of characters to rotate by: ";
 
+  cout << "Enter the text to Caesar encrypt: " << endl;
+  getline(cin, messages);
+
+  cout << "\nEnter the number of characters to rotate by: ";
   cin >> rotateAmmount;
+
   encryptedMessage = rot(messages, rotateAmmount);
   cout << encryptedMessage << endl;
 }
