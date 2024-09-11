@@ -57,8 +57,9 @@ int main() {
       Random::seed(stoi(seed_str));
     } else if (command == "C" || command == "c") {
       runCaesarEncrypt();
+    } else if (command == "A" || command == "a") {
+      applyRandSubstCipherCommand();
     }
-    // Test
 
     cout << endl;
 
@@ -82,7 +83,7 @@ char rot(char c, int amount) {
     }
     return (char)newCharASCIIVall;
   }
-  return c;
+  return '\0';
 }
 
 string rot(const string& line, int amount) {
@@ -149,12 +150,30 @@ void runCaesarDecrypt(const vector<string>& dict) {
 #pragma region SubstEnc
 
 string applySubstCipher(const vector<char>& cipher, const string& s) {
-  // TODO: student fill this in
-  return "";
+  string result;
+
+  for (char c : s) {
+    if (c >= 'a' && c <= 'z') {
+      c = toupper(c);
+    }
+
+    if (c >= 'A' && c <= 'Z') {
+      result += cipher[c - 'A'];
+    } else {
+      result += c;
+    }
+  }
+  return result;
 }
 
 void applyRandSubstCipherCommand() {
-  // TODO: student fill this in
+  vector<char> cipher = genRandomSubstCipher();
+  string s;
+  cout << "Enter the text to substitution-cipher encrypt: ";
+  getline(cin, s);
+  string result = applySubstCipher(cipher, s);
+
+  cout << result << endl;
 }
 
 #pragma endregion SubstEnc

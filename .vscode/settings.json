@@ -16,7 +16,8 @@
     "tuple": "cpp",
     "string": "cpp",
     "fstream": "cpp",
-    "chrono": "cpp"
+    "chrono": "cpp",
+    "functional": "cpp"
   },
   "[cpp]": {
     "editor.wordBasedSuggestions": "off",
