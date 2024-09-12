@@ -76,14 +76,13 @@ int main() {
 
 char rot(char c, int amount) {
   char cUpper = toupper(c);
+  int newCharASCIIVall = cUpper + amount;
   if (cUpper >= 'A' && cUpper <= 'Z') {
-    int newCharASCIIVall = cUpper + amount;
     if (newCharASCIIVall > 'Z') {
       newCharASCIIVall = 'A' + (newCharASCIIVall - 'Z' - 1);
     }
-    return (char)newCharASCIIVall;
   }
-  return '\0';
+  return (char)newCharASCIIVall;
 }
 
 string rot(const string& line, int amount) {
@@ -91,7 +90,7 @@ string rot(const string& line, int amount) {
   for (char ch : line) {
     if (ch == ' ') {
       newString += ' ';
-    } else {
+    } else if (isalpha(ch)) {
       newString += rot(ch, amount);
     }
   }
@@ -151,12 +150,10 @@ void runCaesarDecrypt(const vector<string>& dict) {
 
 string applySubstCipher(const vector<char>& cipher, const string& s) {
   string result;
-
   for (char c : s) {
     if (c >= 'a' && c <= 'z') {
       c = toupper(c);
     }
-
     if (c >= 'A' && c <= 'Z') {
       result += cipher[c - 'A'];
     } else {
