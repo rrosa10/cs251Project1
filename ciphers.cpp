@@ -14,12 +14,8 @@
 
 using namespace std;
 
-// Initialize random number generator in .cpp file for ODR reasons
 std::mt19937 Random::rng;
 
-/**
- * Print instructions for using the program.
- */
 void printMenu() {
   cout << "Ciphers Menu" << endl;
   cout << "------------" << endl;
@@ -35,6 +31,19 @@ void printMenu() {
 int main() {
   Random::seed(time(NULL));
   string command;
+
+  // ifstream inFile("dictionary.txt");
+  // vector<string> dictionary;
+  // string word;
+
+  // if (inFile.is_open()) {
+  //   while (inFile >> word) {
+  //     dictionary.push_back(word);
+  //   }
+  //   inFile.close();
+  // } else {
+  //   cout << "Unable to open file" << endl;
+  // }
 
   cout << "Welcome to Ciphers!" << endl;
   cout << "-------------------" << endl;
@@ -68,10 +77,6 @@ int main() {
   return 0;
 }
 
-// "#pragma region" and "#pragma endregion" group related functions in this file
-// to tell VSCode that these are "foldable". You might have noticed the little
-// down arrow next to functions or loops, and that you can click it to collapse
-// those bodies. This lets us do the same thing for arbitrary chunks!
 #pragma region CaesarEnc
 
 char rot(char c, int amount) {
@@ -117,22 +122,43 @@ void runCaesarEncrypt() {
 #pragma region CaesarDec
 
 void rot(vector<string>& strings, int amount) {
-  // TODO: student fill this in
+  for (string& str : strings) {
+    str = rot(str, amount);
+  }
 }
 
 string clean(const string& s) {
-  // TODO: student fill this in
-  return "";
+  string newString;
+  for (char ch : s) {
+    if (isalpha(ch)) {
+      newString += toupper(ch);
+    }
+  }
+  return newString;
 }
 
 vector<string> splitBySpaces(const string& s) {
-  // TODO: student fill this in
-  return vector<string>{};
+  vector<string> extractedWords;
+  string word;
+
+  stringstream testStream(s);
+  while (testStream >> word) {
+    extractedWords.push_back(word);
+  }
+  return extractedWords;
 }
 
 string joinWithSpaces(const vector<string>& words) {
-  // TODO: student fill this in
-  return "";
+  //==========================================================================
+  string joinedWords;
+  for (int i = 0; i < words.size(); i++) {
+    joinedWords = joinedWords + words.at(i);
+    if (i != words.size() - 1) {
+      joinedWords = joinedWords + " ";
+    }
+  }
+
+  return joinedWords;
 }
 
 int numWordsIn(const vector<string>& words, const vector<string>& dict) {
