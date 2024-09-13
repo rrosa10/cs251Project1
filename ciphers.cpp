@@ -32,29 +32,28 @@ int main() {
   Random::seed(time(NULL));
   string command;
 
-  // ifstream inFile("dictionary.txt");
-  // vector<string> dictionary;
-  // string word;
+  ifstream inFile("dictionary.txt");
+  vector<string> dictionary;
+  string word;
 
-  // if (inFile.is_open()) {
-  //   while (inFile >> word) {
-  //     dictionary.push_back(word);
-  //   }
-  //   inFile.close();
-  // } else {
-  //   cout << "Unable to open file" << endl;
-  // }
+  if (inFile.is_open()) {
+    while (inFile >> word) {
+      dictionary.push_back(word);
+    }
+    inFile.close();
+  } else {
+    cout << "Unable to open file" << endl;
+  }
 
   cout << "Welcome to Ciphers!" << endl;
   cout << "-------------------" << endl;
   cout << endl;
 
   do {
+    cout << "Printing menu..." << endl;
     printMenu();
-    cout << endl << "Enter a command (case does not matter): ";
 
-    // Use getline for all user input to avoid needing to handle
-    // input buffer issues relating to using both >> and getline
+    cout << endl << "Enter a command (case does not matter): ";
     getline(cin, command);
     cout << endl;
 
@@ -68,8 +67,9 @@ int main() {
       runCaesarEncrypt();
     } else if (command == "A" || command == "a") {
       applyRandSubstCipherCommand();
+    } else if (command == "D" || command == "d") {
+      runCaesarDecrypt(dictionary);
     }
-
     cout << endl;
 
   } while (!(command == "x" || command == "X") && !cin.eof());
@@ -107,11 +107,13 @@ void runCaesarEncrypt() {
   string encryptedMessage;
   int rotateAmmount;
 
-  cout << "Enter the text to Caesar encrypt: " << endl;
+  cout << "Enter the text to Caesar encrypt: ";
   getline(cin, messages);
 
   cout << "\nEnter the number of characters to rotate by: ";
   cin >> rotateAmmount;
+
+  cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
   encryptedMessage = rot(messages, rotateAmmount);
   cout << encryptedMessage << endl;
@@ -149,7 +151,6 @@ vector<string> splitBySpaces(const string& s) {
 }
 
 string joinWithSpaces(const vector<string>& words) {
-  //==========================================================================
   string joinedWords;
   for (int i = 0; i < words.size(); i++) {
     joinedWords = joinedWords + words.at(i);
@@ -157,17 +158,59 @@ string joinWithSpaces(const vector<string>& words) {
       joinedWords = joinedWords + " ";
     }
   }
-
   return joinedWords;
 }
 
 int numWordsIn(const vector<string>& words, const vector<string>& dict) {
-  // TODO: student fill this in
-  return 0;
+  int numsWordsIn = 0;
+  for (const string& word : words) {
+    bool found = false;
+    for (const string& dictWord : dict) {
+      if (word == dictWord) {
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      numsWordsIn++;
+    }
+  }
+  return numsWordsIn;
 }
 
 void runCaesarDecrypt(const vector<string>& dict) {
-  // TODO: student fill this in
+  //==========================================================================
+  string encryptedMessage;
+  string decryptedMessage;
+  vector<string> splitWords;
+  vector<string> cleanedSplitWords;
+  vector<string> decryptedmessageVector;
+
+  cout << "Enter the text to Caesar decrypt:";
+  getline(cin, encryptedMessage);
+  splitWords = splitBySpaces(encryptedMessage);
+  for (string words : splitWords) {
+    cleanedSplitWords.push_back(clean(words));
+  }
+
+  for (int i = 1; i < 25; i++) {
+    for (string words : cleanedSplitWords) {
+      for (string dictWords : dict) {
+        string decryptedWord = rot(words, i);
+        if (decryptedWord == dictWords) {
+          decryptedmessageVector.push_back(decryptedMessage);
+        }
+      }
+    }
+
+    int wordCount = numWordsIn(decryptedmessageVector, dict);
+    if (wordCount >= (decryptedmessageVector.size() / 2)) {
+      decryptedMessage = joinWithSpaces(decryptedmessageVector);
+      cout << decryptedMessage << endl;
+    } else {
+      cout << "No good decryptions found" << endl;
+    }
+  }
 }
 
 #pragma endregion CaesarDec
