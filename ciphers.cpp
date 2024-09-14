@@ -41,26 +41,24 @@ int main() {
       dictionary.push_back(word);
     }
     inFile.close();
-  } else {
-    cout << "Unable to open file" << endl;
   }
 
   cout << "Welcome to Ciphers!" << endl;
   cout << "-------------------" << endl;
   cout << endl;
+  cout << "Printing menu..." << endl;
 
   do {
-    cout << "Printing menu..." << endl;
     printMenu();
 
-    cout << endl << "Enter a command (case does not matter): ";
+    cout << endl << "Enter a command (case does not matter):\n";
     getline(cin, command);
     cout << endl;
 
     if (command == "R" || command == "r") {
       string seed_str;
       cout << "Enter a non-negative integer to seed the random number "
-              "generator: ";
+              "generator: \n";
       getline(cin, seed_str);
       Random::seed(stoi(seed_str));
     } else if (command == "C" || command == "c") {
@@ -105,17 +103,17 @@ string rot(const string& line, int amount) {
 void runCaesarEncrypt() {
   string messages;
   string encryptedMessage;
-  int rotateAmmount;
+  string rotateAmmount;
+  int rotateAmmountInt;
 
   cout << "Enter the text to Caesar encrypt: ";
   getline(cin, messages);
 
   cout << "\nEnter the number of characters to rotate by: ";
-  cin >> rotateAmmount;
+  getline(cin, rotateAmmount);
+  rotateAmmountInt = stoi(rotateAmmount);
 
-  cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-  encryptedMessage = rot(messages, rotateAmmount);
+  encryptedMessage = rot(messages, rotateAmmountInt);
   cout << encryptedMessage << endl;
 }
 
@@ -179,7 +177,6 @@ int numWordsIn(const vector<string>& words, const vector<string>& dict) {
 }
 
 void runCaesarDecrypt(const vector<string>& dict) {
-  //==========================================================================
   string encryptedMessage;
   vector<string> splitWords;
   vector<string> decryptedMessage;
@@ -194,8 +191,7 @@ void runCaesarDecrypt(const vector<string>& dict) {
     words = clean(words);
   }
 
-  // somehting->numwordsin->joinwithspces
-  for (int i = 1; i <= 26; i++) {
+  for (int i = 0; i <= 25; i++) {
     vector<string> rotatedWords = splitWords;
     for (string& word : rotatedWords) {
       word = rot(word, i);
@@ -215,9 +211,15 @@ void runCaesarDecrypt(const vector<string>& dict) {
     }
   }
 
-  if (maxValidWords == 0) {
+  if (maxValidWords <= (splitWords.size() / 2)) {
     cout << "No good decryptions found\n";
-  } else {
+  }
+
+  else if (maxValidWords == 0) {
+    cout << "No good decryptions found\n";
+  }
+
+  else if (maxValidWords > (splitWords.size() / 2)) {
     for (int i = 0; i < bestRotations.size(); ++i) {
       cout << decryptedMessage[i] << endl;
     }
@@ -258,6 +260,7 @@ void applyRandSubstCipherCommand() {
 #pragma region SubstDec
 
 double scoreString(const QuadgramScorer& scorer, const string& s) {
+  //==========================================================================
   // TODO: student fill this in
   return 0.0;
 }
