@@ -181,12 +181,11 @@ int numWordsIn(const vector<string>& words, const vector<string>& dict) {
 void runCaesarDecrypt(const vector<string>& dict) {
   //==========================================================================
   string encryptedMessage;
-  string decryptedMessage;
   vector<string> splitWords;
-  vector<int> rotWordCount;
-  vector<int> maxIndexes;
-  vector<string> decryptWordVector;
-  int wordCount = 0;
+  vector<string> decryptedMessage;
+  int maxValidWords = 0;
+  int validWords = 0;
+  vector<int> bestRotations;
 
   cout << "Enter the text to Caesar decrypt: \n";
   getline(cin, encryptedMessage);
@@ -197,27 +196,30 @@ void runCaesarDecrypt(const vector<string>& dict) {
 
   // somehting->numwordsin->joinwithspces
   for (int i = 1; i <= 26; i++) {
-    rot(splitWords, i);
-    wordCount = numWordsIn(splitWords, dict);
-    rotWordCount.push_back(wordCount);
-    cout << wordCount << endl;
-  }
+    vector<string> rotatedWords = splitWords;
+    for (string& word : rotatedWords) {
+      word = rot(word, i);
+    }
 
-  int maxVal = rotWordCount[0];
-  for (int i = 1; i < rotWordCount.size(); i++) {
-    if (rotWordCount[i] > maxVal) {
-      maxVal = rotWordCount[i];
+    validWords = numWordsIn(rotatedWords, dict);
+
+    if (validWords > maxValidWords) {
+      maxValidWords = validWords;
+      bestRotations.clear();
+      decryptedMessage.clear();
+      bestRotations.push_back(i);
+      decryptedMessage.push_back(joinWithSpaces(rotatedWords));
+    } else if (validWords == maxValidWords) {
+      bestRotations.push_back(i);
+      decryptedMessage.push_back(joinWithSpaces(rotatedWords));
     }
   }
 
-  for (int i = 0; i < rotWordCount.size(); i++) {
-    if (rotWordCount[i] == maxVal) {
-    }
-  }
-
-  for (string word : splitWords) {
-    for (int index : maxIndexes) {
-      decryptWordVector.push_back(rot(word, index));
+  if (maxValidWords == 0) {
+    cout << "No good decryptions found\n";
+  } else {
+    for (int i = 0; i < bestRotations.size(); ++i) {
+      cout << decryptedMessage[i] << endl;
     }
   }
 }
