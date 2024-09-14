@@ -183,41 +183,32 @@ void runCaesarDecrypt(const vector<string>& dict) {
   string encryptedMessage;
   string decryptedMessage;
   vector<string> splitWords;
-  vector<int> rotWordCount;
-  vector<int> maxIndexes;
-  vector<string> decryptWordVector;
-  int wordCount = 0;
+  vector<string> cleanedSplitWords;
+  vector<string> decryptedmessageVector;
 
-  cout << "Enter the text to Caesar decrypt: \n";
+  cout << "Enter the text to Caesar decrypt:";
   getline(cin, encryptedMessage);
   splitWords = splitBySpaces(encryptedMessage);
-  for (string& words : splitWords) {
-    words = clean(words);
+  for (string words : splitWords) {
+    cleanedSplitWords.push_back(clean(words));
   }
 
-  // somehting->numwordsin->joinwithspces
-  for (int i = 1; i <= 26; i++) {
-    rot(splitWords, i);
-    wordCount = numWordsIn(splitWords, dict);
-    rotWordCount.push_back(wordCount);
-    cout << wordCount << endl;
-  }
-
-  int maxVal = rotWordCount[0];
-  for (int i = 1; i < rotWordCount.size(); i++) {
-    if (rotWordCount[i] > maxVal) {
-      maxVal = rotWordCount[i];
+  for (int i = 1; i < 25; i++) {
+    for (string words : cleanedSplitWords) {
+      for (string dictWords : dict) {
+        string decryptedWord = rot(words, i);
+        if (decryptedWord == dictWords) {
+          decryptedmessageVector.push_back(decryptedMessage);
+        }
+      }
     }
-  }
 
-  for (int i = 0; i < rotWordCount.size(); i++) {
-    if (rotWordCount[i] == maxVal) {
-    }
-  }
-
-  for (string word : splitWords) {
-    for (int index : maxIndexes) {
-      decryptWordVector.push_back(rot(word, index));
+    int wordCount = numWordsIn(decryptedmessageVector, dict);
+    if (wordCount >= (decryptedmessageVector.size() / 2)) {
+      decryptedMessage = joinWithSpaces(decryptedmessageVector);
+      cout << decryptedMessage << endl;
+    } else {
+      cout << "No good decryptions found" << endl;
     }
   }
 }
