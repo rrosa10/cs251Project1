@@ -12,6 +12,8 @@
 #include "include/subst_enc.h"
 #include "utils.h"
 
+vector<string> loadDictionary(const string& filename);
+
 using namespace std;
 
 std::mt19937 Random::rng;
@@ -32,21 +34,11 @@ int main() {
   Random::seed(time(NULL));
   string command;
 
-  ifstream inFile("dictionary.txt");
-  vector<string> dictionary;
-  string word;
-
-  if (inFile.is_open()) {
-    while (inFile >> word) {
-      dictionary.push_back(word);
-    }
-    inFile.close();
-  }
-
   cout << "Welcome to Ciphers!" << endl;
   cout << "-------------------" << endl;
   cout << endl;
   cout << "Printing menu..." << endl;
+  vector<string> dictionary = loadDictionary("dictionary.txt");
 
   do {
     printMenu();
@@ -54,6 +46,29 @@ int main() {
     cout << endl << "Enter a command (case does not matter):\n";
     getline(cin, command);
     cout << endl;
+
+    ifstream quadgramFile("english_quadgrams.txt");
+    vector<string> quadgrams;
+    vector<int> counts;
+    string line;
+
+    if (!quadgramFile.is_open()) {
+      cerr << "Error opening file: english_quadgrams.txt" << endl;
+      return 1;
+    }
+
+    while (getline(quadgramFile, line)) {
+      istringstream iss(line);
+      string quadgram;
+      int count;
+      if (iss >> quadgram >> count) {
+        quadgrams.push_back(quadgram);
+        counts.push_back(count);
+      }
+    }
+    quadgramFile.close();
+
+    QuadgramScorer scorer(quadgrams, counts);
 
     if (command == "R" || command == "r") {
       string seed_str;
@@ -67,12 +82,48 @@ int main() {
       applyRandSubstCipherCommand();
     } else if (command == "D" || command == "d") {
       runCaesarDecrypt(dictionary);
+    } else if (command == "E" || command == "e") {
+      computeEnglishnessCommand(scorer);
     }
     cout << endl;
 
   } while (!(command == "x" || command == "X") && !cin.eof());
 
   return 0;
+}
+
+void loadQuadgramsAndCounts(const string& filename, vector<string>& quadgrams,
+                            vector<int>& counts) {
+  ifstream file(filename);
+  string quadgram;
+  int count;
+
+  if (file.is_open()) {
+    while (file >> quadgram >> count) {
+      quadgrams.push_back(quadgram);
+      counts.push_back(count);
+    }
+    file.close();
+  } else {
+    cerr << "Failed to open file: " << filename << endl;
+  }
+}
+
+vector<string> loadDictionary(const string& filename) {
+  vector<string> dictionary;
+  ifstream inFile(filename);
+  string word;
+
+  if (inFile.is_open()) {
+    while (inFile >> word) {
+      dictionary.push_back(word);
+    }
+    inFile.close();
+  } else {
+    cerr << "Failed to open file: " << filename << endl;
+  }
+
+  return dictionary;
 }
 
 #pragma region CaesarEnc
@@ -260,13 +311,29 @@ void applyRandSubstCipherCommand() {
 #pragma region SubstDec
 
 double scoreString(const QuadgramScorer& scorer, const string& s) {
-  //==========================================================================
-  // TODO: student fill this in
-  return 0.0;
+  double totalScore = 0.0;
+
+  if (s.length() < 4) {
+    return 0.0;
+  }
+
+  for (int i = 0; i <= s.length() - 4; i++) {
+    string quadgram = s.substr(i, 4);
+    totalScore += scorer.getScore(quadgram);
+  }
+  return totalScore;
 }
 
 void computeEnglishnessCommand(const QuadgramScorer& scorer) {
-  // TODO: student fill this in
+  //==========================================================================
+  string text;
+
+  cout << "Enter a string to score: " << endl;
+  getline(cin, text);
+
+  double score = scoreString(scorer, text);
+
+  cout << "Englishness: " << score << endl;
 }
 
 vector<char> decryptSubstCipher(const QuadgramScorer& scorer,
