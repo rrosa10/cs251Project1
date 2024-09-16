@@ -34,11 +34,35 @@ int main() {
   Random::seed(time(NULL));
   string command;
 
+  ifstream quadgramFile("english_quadgrams.txt");
+  vector<string> quadgramVector;
+  vector<int> countVector;
+  string line;
+
+  if (!quadgramFile.is_open()) {
+    cerr << "Failed to open file: english_quadgrams.txt" << endl;
+    return 1;
+  }
+
+  while (getline(quadgramFile, line)) {
+    istringstream iss(line);
+    string quadgram;
+    int count;
+
+    if (getline(iss, quadgram, ',') && iss >> count) {
+      quadgramVector.push_back(quadgram);
+      countVector.push_back(count);
+    }
+  }
+  quadgramFile.close();
+
+  QuadgramScorer scorer(quadgramVector, countVector);
+  vector<string> dictionary = loadDictionary("dictionary.txt");
+
   cout << "Welcome to Ciphers!" << endl;
   cout << "-------------------" << endl;
   cout << endl;
   cout << "Printing menu..." << endl;
-  vector<string> dictionary = loadDictionary("dictionary.txt");
 
   do {
     printMenu();
@@ -46,29 +70,6 @@ int main() {
     cout << endl << "Enter a command (case does not matter):\n";
     getline(cin, command);
     cout << endl;
-
-    ifstream quadgramFile("english_quadgrams.txt");
-    vector<string> quadgrams;
-    vector<int> counts;
-    string line;
-
-    if (!quadgramFile.is_open()) {
-      cerr << "Error opening file: english_quadgrams.txt" << endl;
-      return 1;
-    }
-
-    while (getline(quadgramFile, line)) {
-      istringstream iss(line);
-      string quadgram;
-      int count;
-      if (iss >> quadgram >> count) {
-        quadgrams.push_back(quadgram);
-        counts.push_back(count);
-      }
-    }
-    quadgramFile.close();
-
-    QuadgramScorer scorer(quadgrams, counts);
 
     if (command == "R" || command == "r") {
       string seed_str;
@@ -325,15 +326,25 @@ double scoreString(const QuadgramScorer& scorer, const string& s) {
 }
 
 void computeEnglishnessCommand(const QuadgramScorer& scorer) {
-  //==========================================================================
   string text;
-
   cout << "Enter a string to score: " << endl;
   getline(cin, text);
+  string cleanedText;
+  double totalScore = 0.0;
 
-  double score = scoreString(scorer, text);
+  for (char c : text) {
+    if (isalpha(c)) {
+      cleanedText += toupper(c);
+    }
+  }
 
-  cout << "Englishness: " << score << endl;
+  if (cleanedText.length() >= 4) {
+    for (int i = 0; i <= cleanedText.length() - 4; i++) {
+      string quadgram = cleanedText.substr(i, 4);
+      totalScore += scorer.getScore(quadgram);
+    }
+  }
+  cout << "Englishness: " << totalScore << endl;
 }
 
 vector<char> decryptSubstCipher(const QuadgramScorer& scorer,
