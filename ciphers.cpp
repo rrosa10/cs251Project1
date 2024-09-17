@@ -353,8 +353,6 @@ vector<char> decryptSubstCipher(const QuadgramScorer& scorer,
   return vector<char>{};
 }
 
-void decryptSubstCipherCommand(const QuadgramScorer& scorer) {
-  // TODO: student fill this in
-}
+void decryptSubstCipherCommand(const QuadgramScorer& scorer) {}
 
 #pragma endregion SubstDec
