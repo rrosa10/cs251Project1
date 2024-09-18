@@ -376,44 +376,64 @@ string decrypt(const string& key, const string& ciphertext) {
 
 vector<char> decryptSubstCipher(const QuadgramScorer& scorer,
                                 const string& ciphertext) {
+  // Initialize the best score to a very low value
   double bestScore = -1e9;
+
+  // Initialize the best key and current key to the alphabet in order
   string bestKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   string currentKey = bestKey;
+
+  // Initialize the best decryption to the original ciphertext
   string bestDecryption = ciphertext;
 
+  // Initialize a random number generator with the current time as the seed
   mt19937 rng(time(0));
 
+  // Perform 20 runs to find the best decryption
   for (int run = 0; run < 20; ++run) {
+    // Shuffle the current key randomly
     shuffle(currentKey.begin(), currentKey.end(), rng);
 
+    // Initialize the count of iterations without improvement
     int noImprovementCount = 0;
+
+    // Perform up to 1500 iterations without improvement
     while (noImprovementCount < 1500) {
+      // Generate two random indices for swapping
       int idx1 = Random::randInt(25);
       int idx2;
       do {
         idx2 = Random::randInt(25);
-      } while (idx1 == idx2);
+      } while (idx1 == idx2);  // Ensure the indices are different
 
+      // Swap the characters at the two indices in the current key
       swap(currentKey[idx1], currentKey[idx2]);
 
+      // Decrypt the ciphertext using the current key
       string decryptedText = decrypt(currentKey, ciphertext);
 
+      // Clean the decrypted text (e.g., remove non-letter characters)
       string cleanedText = cleanText(decryptedText);
 
+      // Score the cleaned text using the quadgram scorer
       double score = scoreString(scorer, cleanedText);
 
+      // If the new score is better than the best score, update the best values
       if (score > bestScore) {
         bestScore = score;
         bestKey = currentKey;
         bestDecryption = decryptedText;
-        noImprovementCount = 0;
+        noImprovementCount = 0;  // Reset the no improvement count
       } else {
+        // If the score is not better, revert the swap and increment the no
+        // improvement count
         swap(currentKey[idx1], currentKey[idx2]);
         noImprovementCount++;
       }
     }
   }
 
+  // Return the best decryption found as a vector of characters
   return vector<char>(bestDecryption.begin(), bestDecryption.end());
 }
 
