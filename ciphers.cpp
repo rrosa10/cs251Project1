@@ -374,105 +374,92 @@ string decrypt(const string& key, const string& ciphertext) {
 vector<char> decryptSubstCipher(const QuadgramScorer& scorer,
                                 const string& ciphertext) {
   vector<char> bestCipher = genRandomSubstCipher();
-  string bestStr = applySubstCipher(bestCipher, ciphertext);
-  double bestScore = scoreString(scorer, bestStr);
+  double bestScore =
+      scoreString(scorer, applySubstCipher(bestCipher, ciphertext));
 
-  for (int i = 0; i < 20; i++) {
-    vector<char> currCipher = genRandomSubstCipher();
-    string currStrCipher = applySubstCipher(currCipher, ciphertext);
-    double currScore = scoreString(scorer, currStrCipher);
-    int swapsCount = 0;
+  for (int runIndex = 0; runIndex < 20; runIndex++) {
+    vector<char> currentCipher = genRandomSubstCipher();
+    double currentScore =
+        scoreString(scorer, applySubstCipher(currentCipher, ciphertext));
+    int attempts = 0;
 
-    while (swapsCount < 1500) {
-      vector<char> cipherHolder = currCipher;
-      int firstNum = Random::randInt(ALPHABET.size() - 1);
-      int secondNum = Random::randInt(ALPHABET.size() - 1);
+    while (attempts < 1500) {
+      int firstIndex = Random::randInt(ALPHABET.size() - 1);
+      int secondIndex;
+      do {
+        secondIndex = Random::randInt(ALPHABET.size() - 1);
+      } while (firstIndex == secondIndex);
 
-      while (firstNum == secondNum) {
-        secondNum = Random::randInt(ALPHABET.size() - 1);
-      }
+      vector<char> tempCipher = currentCipher;
+      swap(tempCipher[firstIndex], tempCipher[secondIndex]);
 
-      char charHolder = cipherHolder[firstNum];
-      cipherHolder[firstNum] = cipherHolder[secondNum];
-      cipherHolder[secondNum] = charHolder;
+      double tempScore =
+          scoreString(scorer, applySubstCipher(tempCipher, ciphertext));
+      attempts++;
 
-      string strHolder = applySubstCipher(cipherHolder, ciphertext);
-      double scoreHolder = scoreString(scorer, strHolder);
-      swapsCount++;
-
-      if (scoreHolder > currScore) {
-        currScore = scoreHolder;
-        currCipher = cipherHolder;
-        swapsCount = 0;
+      if (tempScore > currentScore) {
+        currentScore = tempScore;
+        currentCipher = tempCipher;
+        attempts = 0;
       }
     }
 
-    if (currScore > bestScore) {
-      bestScore = currScore;
-      bestCipher = currCipher;
+    if (currentScore > bestScore) {
+      bestScore = currentScore;
+      bestCipher = currentCipher;
     }
   }
   return bestCipher;
 }
 
-// Function to decrypt a substitution cipher from user input
 void decryptSubstCipherCommand(const QuadgramScorer& scorer) {
   cout << "Enter text to decrypt: ";
-  string ciphertext;
-  getline(cin, ciphertext);
-  vector<char> best = decryptSubstCipher(scorer, ciphertext);
+  string inputCiphertext;
+  getline(cin, inputCiphertext);
 
-  ciphertext = applySubstCipher(best, ciphertext);
-  cout << endl << ciphertext << endl;
+  vector<char> bestDecryptionKey = decryptSubstCipher(scorer, inputCiphertext);
+  string decryptedText = applySubstCipher(bestDecryptionKey, inputCiphertext);
+
+  cout << endl << decryptedText << endl;
 }
 
-// Function to decrypt a substitution cipher from a file
 void decryptFileCommand(const QuadgramScorer& scorer) {
   string inputFilename, outputFilename;
 
-  // Prompt the user to enter the input and output filenames
   cout << "Enter input filename: ";
   getline(cin, inputFilename);
   cout << "Enter output filename: ";
   getline(cin, outputFilename);
 
-  // Open the input file
   ifstream inputFile(inputFilename);
   if (!inputFile.is_open()) {
     cerr << "Failed to open input file: " << inputFilename << endl;
     return;
   }
 
-  // Read the entire content of the input file into a string
   stringstream temp;
   temp << inputFile.rdbuf();
   string ciphertext = temp.str();
   inputFile.close();
 
-  // Convert all alphabetic characters to uppercase
   for (char& c : ciphertext) {
     if (isalpha(c)) {
       c = toupper(c);
     }
   }
 
-  // Decrypt the ciphertext using the substitution cipher decryption function
   vector<char> decryptedText = decryptSubstCipher(scorer, ciphertext);
 
-  // Open the output file
   ofstream outputFile(outputFilename);
   if (!outputFile.is_open()) {
     cerr << "Failed to open output file: " << outputFilename << endl;
     return;
   }
-
-  // Write the decrypted text to the output file
   for (char c : decryptedText) {
     outputFile << c;
   }
   outputFile.close();
-
-  // Inform the user that the decryption is complete
   cout << "Decryption complete. Output written to " << outputFilename << endl;
 }
+
 #pragma endregion SubstDec
